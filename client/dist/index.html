@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+<html>
+<style>
+
+.box {
+  font: 10px sans-serif;
+}
+.box line,
+.box rect,
+.box circle {
+  fill: steelblue;
+  stroke: #000;
+  stroke-width: 1px;
+}
+.box .center {
+  stroke-dasharray: 3,3;
+}
+.box .outlier {
+    fill: white;
+    stroke: dimgrey;
+}
+.axis {
+  font: 12px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+</style>
+<body>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+  <div id="app"></div>
+  <script src="bundle.js"></script>
+</body>
+</html>
