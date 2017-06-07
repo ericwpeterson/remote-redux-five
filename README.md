@@ -185,6 +185,10 @@ export const REQUEST = {
 ### Reducer Composition
 In order to support the protocol reducers should insert there state insided the monobjects tree. In this example ups is reducer. See the source code for more information.
 
+### Get Action Flow
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
+
 
 ## Instructions
 
