@@ -86,8 +86,6 @@ describe('monobjectserver', () => {
 
         expect(onChanged123).to.equal(true);
 
-        //console.log( JSON.stringify(store.getState(), null, 4 ))
-
     })
 
     it('unregisters propWatchers', () => {

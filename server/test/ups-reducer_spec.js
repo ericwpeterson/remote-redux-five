@@ -23,6 +23,6 @@ describe('ups reducer', () => {
         const nextState = store.getState();
         //expect(nextState.monobjects.ups.inputVoltage).to.equal(123);
 
-        console.log('next state', nextState);
+        //console.log('next state', nextState);
     });
 })

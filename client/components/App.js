@@ -17,17 +17,11 @@ class App extends Component {
 
         let monuxState = this.props.app.toJS();
 
-        console.log( monuxState )
+        console.log( 'monux state', monuxState )
 
         let monuxCompleteState = (val) => {
             return val.state === "COMPLETED"?val.value:null;
         }
-
-        //let inputVoltage = Maybe.of(monuxState)
-          //  .map(R.prop('monobjects'))
-            //.map(R.prop('ups')).map(R.prop('props'))
-            //.map(R.prop('inputVoltage')).orElse("?").value()
-
 
         let inputVoltage = Maybe.of(monuxState)
             .map(R.prop('monobjects'))
@@ -37,7 +31,15 @@ class App extends Component {
 
 
         return (
-            <div> input voltage is {inputVoltage}  </div>
+
+            <div style={{margin: 60, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div>
+                    <button onClick={this.props.beginPolling.bind(this)}> Call beginPolling method </button>
+                </div>
+                <div>
+                    Input voltage is {inputVoltage}
+                </div>
+            </div>
         );
     }
 }
@@ -52,6 +54,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         watchInputVoltage: () => {
             dispatch(watch('ups', 'inputVoltage'));
+        },
+        beginPolling: () => {
+            dispatch(call('ups', 'startPolling', ['/dev/ttyS1'] ));
         }
     }
 }

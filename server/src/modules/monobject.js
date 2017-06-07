@@ -2,6 +2,13 @@
 export const SET_PROP     = 'example1/monobject/SET_PROP';
 export const CALL_METHOD  = 'example1/monobject/CALL_METHOD';
 
+export const REQUEST = {
+    IDLE: 'IDLE',
+    IN_PROGRESS: 'IN_PROGRESS',
+    COMPLETED: 'COMPLETED',
+    ERROR: 'ERROR'
+};
+
 const DEFAULT_STATE = {};
 
 export default function monobjectReducer(state = DEFAULT_STATE, action) {

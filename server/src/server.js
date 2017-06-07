@@ -11,11 +11,11 @@ export const store = makeStore();
 setStore(store);
 
 store.subscribe(  ()=> {
-  console.log( 'store changed ', JSON.stringify(store.getState(), null, 4));
+    console.log( 'store changed ', JSON.stringify(store.getState(), null, 4));
 });
 
 //NOTE: this is what kickstarts the monitoring of the UPS
-store.dispatch(callMethod('ups', 'startPolling', [{location: '/dev/ttyS1'}]));
+//store.dispatch(callMethod('ups', 'startPolling', [{location: '/dev/ttyS1'}]));
 
 
 export default function startServer() {
@@ -55,7 +55,7 @@ export default function startServer() {
         });
 
         socket.on('Call', function(request) {
-            monObjectServer.call(request);
+            monObjectServer.call(request, socket);
         });
     });
 

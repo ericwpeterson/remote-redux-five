@@ -26,13 +26,6 @@ export function unReqisterAllPropWatchers(id) {
     }, R.keys(propWatchers));
 }
 
-export function unReqisterAllMethodWatchers(id) {
-    R.forEach((path) => {
-        let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path])
-        methodWatchers[path] = filtered;
-    }, R.keys(methodWatchers));
-}
-
 //NOTE: unReqisterPropWatcher just removes the notification on the underlying socket from happening.
 // It does not unSubscribe from the store.
 export function unReqisterPropWatcher(monObject, property, id ) {
@@ -52,7 +45,7 @@ export function reqisterPropWatcher(monObject, property, handler ) {
     }
     //just making sure that it does not registered twice
     if ( R.find((_handler) => _handler.id === handler.id, propWatchers[path] )) {
-        console.log('already registered', monObject + '.' + property );
+        //console.log('already registered', monObject + '.' + property );
         return true;
     } else {
         propWatchers[path].push(handler);
@@ -67,7 +60,23 @@ export function reqisterPropWatcher(monObject, property, handler ) {
     }
 }
 
-export function reqisterMethodWatcher(monObject, method, handler ) {
+export function unReqisterAllMethodWatchers(id) {
+    R.forEach((path) => {
+        let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path])
+        methodWatchers[path] = filtered;
+    }, R.keys(methodWatchers));
+}
+
+export let unReqisterMethodWatcher = (monObject, method, id ) => {
+    let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
+
+    if (methodWatchers[path].length > 0 ) {
+        let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path])
+        methodWatchers[path] = filtered;
+    }
+}
+
+export let reqisterMethodWatcher = (monObject, method, handler ) => {
     let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
 
     if (!methodWatchers[path]) {
@@ -75,10 +84,11 @@ export function reqisterMethodWatcher(monObject, method, handler ) {
     }
     //just making sure that it does not registered twice
     if ( R.find((_handler) => _handler.id === handler.id, methodWatchers[path] )) {
-        console.log('already registered', monObject + '.' + method );
+        //console.log('already registered', monObject + '.' + method );
         return true;
     } else {
         methodWatchers[path].push(handler);
+
         //in order to scale, we only subscribe to the store once per property
         if (methodWatchers[path].length === 1 ) {
             let w = watch(store.getState, path)
@@ -87,15 +97,6 @@ export function reqisterMethodWatcher(monObject, method, handler ) {
             }))
         }
         return false;
-    }
-}
-
-export function unReqisterMethodWatcher(monObject, method, id ) {
-    let path = 'monobjects.' + monObject + '.methods.' + method;
-
-    if (methodWatchers[path].length > 0 ) {
-        let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path])
-        methodWatchers[path] = filtered;
     }
 }
 
@@ -150,7 +151,7 @@ let socketWatchNotifier = (w, value, objectPath) => {
 let socketCallNotifier = (w, value, objectPath) => {
     let ret;
     let methodState = value;
-
+  
     if ( value === REQUEST.COMPLETED || value === REQUEST.ERROR ) {
 
         //NOTE: When the request is finished no longer need to watch its state
@@ -249,7 +250,7 @@ let monObjectServer = {
         }
     },
 
-    call: (request) => {
+    call: (request, socket) => {
         let ret;
         if (validRequest('call', request)) {
 

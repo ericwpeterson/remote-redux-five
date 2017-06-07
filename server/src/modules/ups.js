@@ -1,13 +1,4 @@
-import { SET_PROP, CALL_METHOD } from './monobject.js'
-
-
-export const REQUEST = {
-    IDLE: 'IDLE',
-    IN_PROGRESS: 'IN_PROGRESS',
-    COMPLETED: 'COMPLETED',
-    ERROR: 'ERROR'
-};
-
+import { SET_PROP, CALL_METHOD, REQUEST } from './monobject.js'
 
 //add your props and methods here
 const DEFAULT_STATE = {
@@ -18,8 +9,7 @@ const DEFAULT_STATE = {
         },
         methods: {
             startPolling: {
-                state: REQUEST.IDLE,
-                ret: false
+
             }
         }
     }
