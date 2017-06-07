@@ -3,10 +3,8 @@
 ## Goals
 
 1. Define a standard protocol for communicating to micro-services.
-
 2. Add redux to micro-services. 
-⋅⋅2.a Motivations
-
+⋅⋅* Unordered sub-list. 
 
 
 
