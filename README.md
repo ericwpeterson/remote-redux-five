@@ -4,7 +4,7 @@
 
 1. Define a standard protocol for communicating to micro-services.
 2. Add redux to micro-services. 
-⋅⋅* Unordered sub-list. 
+  2.1 Motivations
 
 
 
