@@ -1,5 +1,9 @@
+# Distributed Redux Example
 
-# USB HID Terminal
+## Goals
+
+⋅⋅* Unordered sub-list.
+
 
 
 ## Instructions
