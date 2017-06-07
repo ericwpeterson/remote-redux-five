@@ -3,7 +3,7 @@
 ## Goals
 
   Define a standard protocol for communicating to micro-services.
-  Add redux to micro-services. 
+  Add redux to micro-services.
   Motivations
 
 
