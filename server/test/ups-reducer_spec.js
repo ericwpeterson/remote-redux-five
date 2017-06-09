@@ -16,13 +16,11 @@ describe('ups reducer', () => {
 
 
     it('handles startPoll calls', () => {
-        const store = makeStore();
+        //const store = makeStore();
 
-        store.dispatch(callMethod('ups', 'startPolling', [{location: '/dev/ttyS1'}]));
+        //store.dispatch(callMethod('ups', 'inputVoltage', 123));
+        //const nextState = store.getState();
 
-        const nextState = store.getState();
-        //expect(nextState.monobjects.ups.inputVoltage).to.equal(123);
-
-        //console.log('next state', nextState);
+        //expect(nextState.monobjects.ups.props.inputVoltage).to.equal(123);
     });
 })

@@ -35,6 +35,7 @@ class App extends Component {
             <div style={{margin: 60, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div>
                     <button onClick={this.props.beginPolling.bind(this)}> Call beginPolling method </button>
+                    <button onClick={this.props.readConfig.bind(this)}> Call readConfig method </button>
                 </div>
                 <div>
                     Input voltage is {inputVoltage}
@@ -57,6 +58,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         beginPolling: () => {
             dispatch(call('ups', 'startPolling', ['/dev/ttyS1'] ));
+        },
+        readConfig: () => {
+            dispatch(call('ups', 'readConfig', []));
         }
     }
 }

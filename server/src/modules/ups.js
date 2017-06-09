@@ -5,10 +5,14 @@ const DEFAULT_STATE = {
     ups: {
         props: {
             inputVoltage: 113,
-            outputVoltage: 120
+            outputVoltage: 120,
+            configFile: ''
         },
         methods: {
             startPolling: {
+
+            },
+            readConfig: {
 
             }
         }

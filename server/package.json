@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node index.js",
-    "test": "mocha --compilers js:babel-core/register  --require ./test/test_helper.js  --recursive",
+    "test": "mocha --compilers js:babel-core/register  --require ./test/test_helper.js --require babel-polyfill  --recursive",
     "test:watch": "npm run test -- --watch"
   },
   "author": "",
@@ -13,21 +13,26 @@
   "devDependencies": {
     "babel-cli": "6.5.1",
     "babel-core": "6.5.1",
+    "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "6.5.0",
+    "babel-preset-stage-0": "^6.24.1",
     "chai": "3.5.0",
     "chai-immutable": "1.5.3",
+    "immutable": "^3.8.1",
     "mocha": "^2.4.5"
   },
   "dependencies": {
     "babel-core": "^6.7.7",
     "ramda": "^0.24.1",
     "redux": "^3.6.0",
+    "redux-saga": "^0.10.2",
     "redux-watch": "^1.1.1",
     "socket.io": "1.4.5"
   },
   "babel": {
     "presets": [
-      "es2015"
+      "es2015",
+      "stage-0"
     ]
   }
 }
