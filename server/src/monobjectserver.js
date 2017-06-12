@@ -1,7 +1,6 @@
 import { setProperty, callMethod, REQUEST } from './modules/monobject'
-import watch from 'redux-watch'
+import { watch } from './watch'
 import R from 'ramda'
-import _ from 'underscore'
 
 
 let store;
@@ -56,12 +55,10 @@ export function reqisterPropWatcher(monObject, property, handler ) {
         propWatchers[path].push(handler);
         //in order to scale, we only subscribe to the store once per property
         if (propWatchers[path].length === 1 ) {
-
-            const watcher = watch(() => { return store.getState().monobjects.toJS(); }, path, compare);
-
-            store.subscribe(watcher( (newVal, oldVal, objectPath) => {
-                R.forEach( (w)=> { w.onChange(w, newVal, objectPath) }, propWatchers[objectPath] );
-            }));
+            let w = watch(store.getState, path)
+            store.subscribe(w((newVal, oldVal, objectPath) => {                
+                R.forEach( (watcher) => { watcher.onChange(watcher, newVal, objectPath) }, propWatchers[objectPath] );
+            }))
         }
         return false;
     }
@@ -98,11 +95,10 @@ export let reqisterMethodWatcher = (monObject, method, handler ) => {
 
         //in order to scale, we only subscribe to the store once per property
         if (methodWatchers[path].length === 1 ) {
-            const watcher = watch(() => { return store.getState().monobjects.toJS() }, path, compare);
-
-            store.subscribe(watcher( (newVal, oldVal, objectPath) => {
-                R.forEach( (w)=> { w.onChange(w, newVal, objectPath) }, methodWatchers[objectPath] );
-            }));
+            let w = watch(store.getState, path)
+            store.subscribe(w((newVal, oldVal, objectPath) => {
+                R.forEach( (watcher) => { watcher.onChange(watcher, newVal, objectPath) }, methodWatchers[objectPath] );
+            }))
         }
         return false;
     }
