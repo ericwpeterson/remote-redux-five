@@ -1,3 +1,6 @@
+import {Map, List } from 'immutable';
+import Immutable from 'immutable';
+
 // Action Types
 export const SET_PROP           = 'example1/monobject/SET_PROP';
 export const CALL_METHOD        = 'example1/monobject/CALL_METHOD';
@@ -11,38 +14,37 @@ export const REQUEST = {
     ERROR: 'ERROR'
 };
 
-const DEFAULT_STATE = {};
+const DEFAULT_STATE = Map({});
 
 export default function monobjectReducer(state = DEFAULT_STATE, action) {
     let ret;
+    let path;
 
     switch (action.type) {
 
         case SET_PROP:
-            if (state[action.monObject] && state[action.monObject].props && state[action.monObject].props.hasOwnProperty(action.property)) {
-                let clone = Object.assign({}, state[action.monObject]);
-                clone.props[action.property] = action.value;
-                let newObject = {};
-                newObject[action.monObject] = clone;
-                return Object.assign({}, state, newObject );
+
+            path = [action.monObject, 'props', action.property];
+
+            if ( state.getIn(path) ) {
+                return state.setIn(path,action.value);
             } else {
                 console.log("failed to set prop", action)
                 return state;
             }
 
         case SET_METHOD_STATE:
-            if (state[action.monObject] && state[action.monObject].methods && state[action.monObject].methods.hasOwnProperty(action.method)) {
-                let clone = Object.assign({}, state[action.monObject]);
-                clone.methods[action.method].state = action.state;
-                clone.methods[action.method].ret = action.ret;
-                let newObject = {};
-                newObject[action.monObject] = clone;
-                return Object.assign({}, state, newObject );
+
+            path = [action.monObject, 'methods', action.method];
+
+            if ( state.getIn(path)) {
+                ret = state.setIn([...path, ...['ret']], action.ret);
+                ret = ret.setIn([...path, ...['state']], action.state);
+                return ret;
             } else {
-                console.log("failed to set prop", action)
+                console.log("failed to set method state", action)
                 return state;
             }
-
 
         default:
             return state;

@@ -1,26 +1,49 @@
 import {expect} from 'chai';
 import makeStore from '../src/store';
 
-import { setProperty, callMethod } from '../src/modules/monobject'
+import {toJS, Map, List } from 'immutable';
+import Immutable from 'immutable';
+
+import { setProperty, callMethod, setMethodState, REQUEST } from '../src/modules/monobject'
+
+//console.log( JSON.stringify( nextState.monobjects.toJS(), null, 4 ));
 
 describe('ups reducer', () => {
 
-    it('sets properties', () => {
+    it('takes startPolling actions', () => {
         const store = makeStore();
-
-        store.dispatch(setProperty('ups', 'inputVoltage', 123));
-        const nextState = store.getState();
-
-        expect(nextState.monobjects.ups.props.inputVoltage).to.equal(123);
+        store.dispatch(callMethod('ups', 'startPolling', [] ));
+        let nextState = store.getState();
+        expect(nextState.monobjects.toJS().ups.methods.startPolling.state).to.equal(REQUEST.COMPLETED);
     });
 
+    it('takes setProperty actions', () => {
+        const store = makeStore();
+        store.dispatch(setProperty('ups', 'inputVoltage', 222));
+        let nextState = store.getState();
+        expect(nextState.monobjects.toJS().ups.props.inputVoltage).to.equal(222);
+    });
 
-    it('handles startPoll calls', () => {
-        //const store = makeStore();
+    it('takes setMethodStatus to IN_PROGRESS', () => {
+        const store = makeStore();
+        store.dispatch(setMethodState('ups', 'readConfig', REQUEST.IN_PROGRESS));
+        let nextState = store.getState();
+        expect(nextState.monobjects.toJS().ups.methods.readConfig.state).to.equal(REQUEST.IN_PROGRESS);
+    });
 
-        //store.dispatch(callMethod('ups', 'inputVoltage', 123));
-        //const nextState = store.getState();
+    it('takes setMethodStatus to COMPLETED', () => {
+        const store = makeStore();
+        store.dispatch(setMethodState('ups', 'readConfig', REQUEST.COMPLETED, 'rval'));
+        let nextState = store.getState();
+        expect(nextState.monobjects.toJS().ups.methods.readConfig.state).to.equal(REQUEST.COMPLETED);
+        expect(nextState.monobjects.toJS().ups.methods.readConfig.ret).to.equal('rval');
+    });
 
-        //expect(nextState.monobjects.ups.props.inputVoltage).to.equal(123);
+    it('takes setMethodStatus to ERROR', () => {
+        const store = makeStore();
+        store.dispatch(setMethodState('ups', 'readConfig', REQUEST.ERROR, 'rval'));
+        let nextState = store.getState();
+        expect(nextState.monobjects.toJS().ups.methods.readConfig.state).to.equal(REQUEST.ERROR);
+        expect(nextState.monobjects.toJS().ups.methods.readConfig.ret).to.equal('rval');
     });
 })

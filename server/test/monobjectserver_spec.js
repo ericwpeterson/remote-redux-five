@@ -1,3 +1,5 @@
+
+
 import {expect} from 'chai';
 import makeStore from '../src/store';
 import { setProperty, callMethod } from '../src/modules/monobject'
@@ -36,11 +38,10 @@ describe('monobjectserver', () => {
             onChange: (w, value, objectPath) => {}
         });
 
-        expect(propWatchers['monobjects.ups.props.inputVoltage'].length).to.equal(2);
-        expect(propWatchers['monobjects.ups.props.inputVoltage'][0].id).to.equal(123);
-        expect(propWatchers['monobjects.ups.props.inputVoltage'][1].id).to.equal(124);
+        expect(propWatchers['ups.props.inputVoltage'].length).to.equal(2);
+        expect(propWatchers['ups.props.inputVoltage'][0].id).to.equal(123);
+        expect(propWatchers['ups.props.inputVoltage'][1].id).to.equal(124);
     });
-
 
     it('calls prop handlers when state changes', () => {
         let onChanged123 = false;
@@ -120,14 +121,13 @@ describe('monobjectserver', () => {
 
         unReqisterPropWatcher('ups', 'inputVoltage', 123 );
 
-        expect(propWatchers['monobjects.ups.props.inputVoltage'].length).to.equal(1);
+        expect(propWatchers['ups.props.inputVoltage'].length).to.equal(1);
 
         store.dispatch(setProperty('ups', 'inputVoltage', 0.3));
 
         expect(onChanged123).to.equal(false);
         expect(onChanged124).to.equal(true);
     })
-
 
     it('unregisters all propWatchers by id', () => {
         let onChangeInputVoltage = false;

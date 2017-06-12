@@ -10,13 +10,18 @@ export const store = makeStore();
 //this gives the monobjectserver a reference to the store
 setStore(store);
 
-store.subscribe(  ()=> {
-    console.log( 'store changed ', JSON.stringify(store.getState(), null, 4));
+let lastState;
+
+store.subscribe(()=> {
+    let newState = store.getState();
+    if ( newState !== lastState ) {
+        console.log( 'store changed ', JSON.stringify(store.getState(), null, 4));
+        lastState = newState;
+    }
 });
 
 //NOTE: this is what kickstarts the monitoring of the UPS
 //store.dispatch(callMethod('ups', 'startPolling', [{location: '/dev/ttyS1'}]));
-
 
 export default function startServer() {
 

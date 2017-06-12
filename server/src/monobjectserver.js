@@ -1,6 +1,7 @@
 import { setProperty, callMethod, REQUEST } from './modules/monobject'
 import watch from 'redux-watch'
 import R from 'ramda'
+import _ from 'underscore'
 
 
 let store;
@@ -29,7 +30,7 @@ export function unReqisterAllPropWatchers(id) {
 //NOTE: unReqisterPropWatcher just removes the notification on the underlying socket from happening.
 // It does not unSubscribe from the store.
 export function unReqisterPropWatcher(monObject, property, id ) {
-    let path = 'monobjects.' + monObject + '.props.' + property;
+    let path = monObject + '.props.' + property;
 
     if (propWatchers[path].length > 0 ) {
         let filtered = R.reject(R.where({id: R.equals(id)}), propWatchers[path])
@@ -37,8 +38,12 @@ export function unReqisterPropWatcher(monObject, property, id ) {
     }
 }
 
+const compare = (a, b) => {
+    return _.isEqual(a, b);
+};
+
 export function reqisterPropWatcher(monObject, property, handler ) {
-    let path = 'monobjects.' + monObject + '.props.' + property;
+    let path = monObject + '.props.' + property;
 
     if (!propWatchers[path]) {
         propWatchers[path] = [];
@@ -51,10 +56,12 @@ export function reqisterPropWatcher(monObject, property, handler ) {
         propWatchers[path].push(handler);
         //in order to scale, we only subscribe to the store once per property
         if (propWatchers[path].length === 1 ) {
-            let w = watch(store.getState, path)
-            store.subscribe(w((newVal, oldVal, objectPath) => {
-                R.forEach( (watcher)=> { watcher.onChange(watcher, newVal, objectPath) }, propWatchers[objectPath] );
-            }))
+
+            const watcher = watch(() => { return store.getState().monobjects.toJS(); }, path, compare);
+
+            store.subscribe(watcher( (newVal, oldVal, objectPath) => {
+                R.forEach( (w)=> { w.onChange(watcher, newVal, objectPath) }, propWatchers[objectPath] );
+            }));
         }
         return false;
     }
@@ -68,7 +75,7 @@ export function unReqisterAllMethodWatchers(id) {
 }
 
 export let unReqisterMethodWatcher = (monObject, method, id ) => {
-    let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
+    let path = monObject + '.methods.' + method + '.state';
 
     if (methodWatchers[path].length > 0 ) {
         let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path])
@@ -77,7 +84,7 @@ export let unReqisterMethodWatcher = (monObject, method, id ) => {
 }
 
 export let reqisterMethodWatcher = (monObject, method, handler ) => {
-    let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
+    let path = monObject + '.methods.' + method + '.state';
 
     if (!methodWatchers[path]) {
         methodWatchers[path] = [];
@@ -91,10 +98,11 @@ export let reqisterMethodWatcher = (monObject, method, handler ) => {
 
         //in order to scale, we only subscribe to the store once per property
         if (methodWatchers[path].length === 1 ) {
-            let w = watch(store.getState, path)
-            store.subscribe(w((newVal, oldVal, objectPath) => {
-                R.forEach( (watcher)=> { watcher.onChange(watcher, newVal, objectPath) }, methodWatchers[objectPath] );
-            }))
+            const watcher = watch(() => { return store.getState().monobjects.toJS() }, path, compare);
+
+            store.subscribe(watcher( (newVal, oldVal, objectPath) => {
+                R.forEach( (w)=> { w.onChange(watcher, newVal, objectPath) }, methodWatchers[objectPath] );
+            }));
         }
         return false;
     }
@@ -151,7 +159,7 @@ let socketWatchNotifier = (w, value, objectPath) => {
 let socketCallNotifier = (w, value, objectPath) => {
     let ret;
     let methodState = value;
-  
+
     if ( value === REQUEST.COMPLETED || value === REQUEST.ERROR ) {
 
         //NOTE: When the request is finished no longer need to watch its state

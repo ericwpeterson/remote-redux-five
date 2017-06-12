@@ -1,3 +1,4 @@
+
 import {expect} from 'chai';
 import makeStore from '../src/store';
 
@@ -13,8 +14,6 @@ describe('ups saga', () => {
 
         let action = callMethod('ups', 'readConfig', [] );
 
-        const store = makeStore();
-
         const gen = watchCall(action);
         expect(gen.next().value).to.deep.equal(take(CALL_METHOD));
 
@@ -25,15 +24,11 @@ describe('ups saga', () => {
         //this is the cool part, we dont need to wait 2 seconds an we could just inject
         //some data, or even better simulate a case where the code throws an error.
         expect(gen.next(fileContents).value).to.deep.equal(put(setMethodState('ups', 'readConfig', REQUEST.COMPLETED, fileContents)));
-
-
     });
 
     it('handles an error when reading the file', () => {
 
         let action = callMethod('ups', 'readConfig', [] );
-
-        const store = makeStore();
 
         const gen = watchCall(action);
         expect(gen.next().value).to.deep.equal(take(CALL_METHOD));
