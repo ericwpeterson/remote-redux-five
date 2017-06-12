@@ -62,14 +62,14 @@ describe('monobjectserver', () => {
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 123,
             onChange: (w, value, objectPath) => {
-                //expect(w.id).to.equal(123);
+                expect(w.id).to.equal(123);
                 onChanged123 = true;
             }
         });
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 124,
             onChange: (w, value, objectPath) => {
-                //expect(w.id).to.equal(124);
+                expect(w.id).to.equal(124);
                 onChanged124 = true;
             }
         });
