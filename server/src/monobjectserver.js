@@ -37,10 +37,6 @@ export function unReqisterPropWatcher(monObject, property, id ) {
     }
 }
 
-const compare = (a, b) => {
-    return _.isEqual(a, b);
-};
-
 export function reqisterPropWatcher(monObject, property, handler ) {
     let path = monObject + '.props.' + property;
 
@@ -49,14 +45,13 @@ export function reqisterPropWatcher(monObject, property, handler ) {
     }
     //just making sure that it does not registered twice
     if ( R.find((_handler) => _handler.id === handler.id, propWatchers[path] )) {
-        //console.log('already registered', monObject + '.' + property );
         return true;
     } else {
         propWatchers[path].push(handler);
         //in order to scale, we only subscribe to the store once per property
         if (propWatchers[path].length === 1 ) {
             let w = watch(store.getState, path)
-            store.subscribe(w((newVal, oldVal, objectPath) => {                
+            store.subscribe(w((newVal, oldVal, objectPath) => {
                 R.forEach( (watcher) => { watcher.onChange(watcher, newVal, objectPath) }, propWatchers[objectPath] );
             }))
         }
