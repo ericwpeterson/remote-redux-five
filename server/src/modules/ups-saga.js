@@ -22,6 +22,7 @@ export function* watchCall() {
                 let fileContents = yield call(readConfig);
                 yield put(setMethodState('ups', action.method, REQUEST.COMPLETED, fileContents));
             } catch(e) {
+                console.log( 'err = ', e)
                 yield put(setMethodState('ups', action.method, REQUEST.ERROR));
             }
         }

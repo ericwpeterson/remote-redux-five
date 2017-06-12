@@ -58,12 +58,16 @@ let startPoll = (state, action) => {
 
     if ( state.getIn(path)) {
         let path = [action.monObject, 'methods', action.method];
+
+        let ret = state.setIn([...path, ...['ret']], REQUEST.IN_PROGRESS);
+
+
         //normally this would get set in a async "saga" function but for this demo we pretending like
         //the method is synchnous
 
         //NOTE: it is really important to set ret before setting state
         //because watcher gets fired when state changes
-        let ret = state.setIn([...path, ...['ret']], 'return code');
+        ret = state.setIn([...path, ...['ret']], 'return code');
         ret = ret.setIn([...path, ...['state']], REQUEST.COMPLETED);
 
         return ret;

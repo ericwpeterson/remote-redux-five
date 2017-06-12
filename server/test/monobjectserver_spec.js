@@ -2,7 +2,7 @@
 
 import {expect} from 'chai';
 import makeStore from '../src/store';
-import { setProperty, callMethod } from '../src/modules/monobject'
+import { setProperty, callMethod, setMethodState } from '../src/modules/monobject'
 
 import {
     setStore,
@@ -13,6 +13,8 @@ import {
     clearPropWatchers,
     clearMethodWatchers,
     unReqisterAllPropWatchers,
+    unReqisterMethodWatcher,
+    unReqisterAllMethodWatchers
 
 } from '../src/monobjectserver'
 
@@ -25,17 +27,23 @@ describe('monobjectserver', () => {
 
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 123,
-            onChange: (w, value, objectPath) => {}
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(123);
+            }
         });
 
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 123,
-            onChange: (w, value, objectPath) => {}
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(123);
+            }
         });
 
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 124,
-            onChange: (w, value, objectPath) => {}
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(124);
+            }
         });
 
         expect(propWatchers['ups.props.inputVoltage'].length).to.equal(2);
@@ -54,12 +62,14 @@ describe('monobjectserver', () => {
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 123,
             onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(123);
                 onChanged123 = true;
             }
         });
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 124,
             onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(124);
                 onChanged124 = true;
             }
         });
@@ -80,6 +90,7 @@ describe('monobjectserver', () => {
             id: 123,
             onChange: (w, value, objectPath) => {
                 onChanged123 = true;
+                expect(w.id).to.equal(123);
             }
         });
 
@@ -88,6 +99,36 @@ describe('monobjectserver', () => {
         expect(onChanged123).to.equal(true);
 
     })
+
+    it('unregisters method watchers', () => {
+        let onChanged123 = false;
+
+        clearMethodWatchers();
+        const store = makeStore();
+        setStore(store);
+
+        reqisterMethodWatcher('ups', 'startPolling', {
+            id: 123,
+            onChange: (w, value, objectPath) => {
+                onChanged123 = true;
+                expect(w.id).to.equal(123);
+            }
+        });
+
+        store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1' }]));
+
+        expect(onChanged123).to.equal(true);
+
+        onChanged123 = false;
+
+        unReqisterMethodWatcher('ups', 'startPolling', 123 );
+
+        store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1' }]));
+
+        expect(onChanged123).to.equal(false);
+
+    })
+
 
     it('unregisters propWatchers', () => {
         let onChanged123 = false;
@@ -101,6 +142,7 @@ describe('monobjectserver', () => {
             id: 123,
             onChange: (w, value, objectPath) => {
                 onChanged123 = true;
+                expect(w.id).to.equal(123);
             }
         });
 
@@ -108,6 +150,7 @@ describe('monobjectserver', () => {
             id: 124,
             onChange: (w, value, objectPath) => {
                 onChanged124 = true;
+                expect(w.id).to.equal(124);
             }
         });
 
@@ -142,6 +185,7 @@ describe('monobjectserver', () => {
             id: 123,
             onChange: (w, value, objectPath) => {
                 onChangeInputVoltage = true;
+                expect(w.id).to.equal(123);
             }
         });
 
@@ -149,6 +193,7 @@ describe('monobjectserver', () => {
             id: 124,
             onChange: (w, value, objectPath) => {
                 onChangeInputVoltage_124 = true;
+                expect(w.id).to.equal(124);
             }
         });
 
@@ -156,6 +201,7 @@ describe('monobjectserver', () => {
             id: 123,
             onChange: (w, value, objectPath) => {
                 onChangedOutputVoltage = true;
+                expect(w.id).to.equal(123);
             }
         });
 
@@ -178,5 +224,47 @@ describe('monobjectserver', () => {
         expect(onChangeInputVoltage).to.equal(false);
         expect(onChangeInputVoltage_124).to.equal(true);
         expect(onChangedOutputVoltage).to.equal(false);
+    });
+
+    it('unregisters all methodWatchers by id', () => {
+        let onChanged123 = false;
+        let onChanged124 = false;
+
+        clearMethodWatchers();
+        const store = makeStore();
+        setStore(store);
+
+        reqisterMethodWatcher('ups', 'startPolling', {
+            id: 123,
+            onChange: (w, value, objectPath) => {
+                onChanged123 = true;
+                expect(w.id).to.equal(123);
+            }
+        });
+
+        reqisterMethodWatcher('ups', 'startPolling', {
+            id: 124,
+            onChange: (w, value, objectPath) => {
+                onChanged124 = true;
+                expect(w.id).to.equal(124);
+            }
+        });
+
+        store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1' }]));
+
+        expect(onChanged123).to.equal(true);
+        expect(onChanged124).to.equal(true);
+
+        store.dispatch(setMethodState('ups', 'startPolling', undefined ));
+
+        onChanged123 = false;
+        onChanged124 = false;
+
+        unReqisterAllMethodWatchers(123);
+
+        store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1' }]));
+
+        expect(onChanged123).to.equal(false);
+        expect(onChanged124).to.equal(true);
     });
 });

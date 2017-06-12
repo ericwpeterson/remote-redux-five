@@ -60,7 +60,7 @@ export function reqisterPropWatcher(monObject, property, handler ) {
             const watcher = watch(() => { return store.getState().monobjects.toJS(); }, path, compare);
 
             store.subscribe(watcher( (newVal, oldVal, objectPath) => {
-                R.forEach( (w)=> { w.onChange(watcher, newVal, objectPath) }, propWatchers[objectPath] );
+                R.forEach( (w)=> { w.onChange(w, newVal, objectPath) }, propWatchers[objectPath] );
             }));
         }
         return false;
@@ -101,7 +101,7 @@ export let reqisterMethodWatcher = (monObject, method, handler ) => {
             const watcher = watch(() => { return store.getState().monobjects.toJS() }, path, compare);
 
             store.subscribe(watcher( (newVal, oldVal, objectPath) => {
-                R.forEach( (w)=> { w.onChange(watcher, newVal, objectPath) }, methodWatchers[objectPath] );
+                R.forEach( (w)=> { w.onChange(w, newVal, objectPath) }, methodWatchers[objectPath] );
             }));
         }
         return false;
@@ -165,18 +165,12 @@ let socketCallNotifier = (w, value, objectPath) => {
         //NOTE: When the request is finished no longer need to watch its state
         unReqisterMethodWatcher(w.monObject, w.method, w.id );
 
-        let state = store.getState();
+        let state = store.getState().monobjects;
+        let path = [w.monObject, 'methods', w.method, 'ret'];
 
-        if ( state.monobjects &&
-                      state.monobjects[w.monObject] &&
-                      state.monobjects[w.monObject].methods &&
-                      state.monobjects[w.monObject].methods[w.method] &&
-                      state.monobjects[w.monObject].methods[w.method].ret ) {
-            ret = state.monobjects[w.monObject].methods[w.method].ret;
-        }
+        let ret = state.getIn( path );
 
         try {
-
             w.socket.emit("opCompleted", {'op': "Call::" + w.method, 'monObject': w.monObject, 'ret': ret, 'error': value===REQUEST.COMPLETED?false:true   });
         } catch (e) {
             console.log(e);
@@ -189,16 +183,10 @@ let monObjectServer = {
     get: (request, socket) => {
         let ret;
         if (validRequest('get', request)) {
-            let state = store.getState();
-            if ( state.monobjects &&
-                            state.monobjects[request.monObject] &&
-                            state.monobjects[request.monObject].props  &&
-                            state.monobjects[request.monObject].props[request.property] ) {
-
-                socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': state.monobjects[request.monObject].props[request.property], 'error': false});
-            } else {
-                ret = 'MISSING_PROP';
-            }
+            let state = store.getState().monobjects;
+            let path = [request.monObject, 'props', request.property];
+            let ret = state.getIn( path );
+            socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
         } else {
             ret = 'INVALID_ARGS';
         }
@@ -221,15 +209,12 @@ let monObjectServer = {
     watch: (request, socket) => {
         let ret;
         if (validRequest('watch', request)) {
-            //socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'error': false});
+            let state = store.getState().monobjects;
+            let path = [request.monObject, 'props', request.property];
+            let ret = state.getIn( path );
 
-            let state = store.getState();
-
-            if ( state.monobjects &&
-                            state.monobjects[request.monObject] &&
-                            state.monobjects[request.monObject].props  &&
-                            state.monobjects[request.monObject].props[request.property] ) {
-                socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': state.monobjects[request.monObject].props[request.property], 'error': false});
+            if ( ret ) {
+                socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
             } else {
                 socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'error': false});
             }
