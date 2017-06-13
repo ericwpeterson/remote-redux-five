@@ -4,15 +4,15 @@ import makeStore from '../src/store';
 
 import { put, call, take } from 'redux-saga/effects';
 
-import { watchCall, readConfig } from '../src/modules/ups-saga'
+import { watchCall, readConfig } from '../src/modules/ups-saga';
 
-import { setProperty, callMethod, CALL_METHOD, setMethodState, REQUEST } from '../src/modules/monobject'
+import { setProperty, callMethod, CALL_METHOD, setMethodState, REQUEST } from '../src/modules/monobject';
 
 describe('ups saga', () => {
 
     it('reads in a config file', () => {
 
-        let action = callMethod('ups', 'readConfig', [] );
+        let action = callMethod('ups', 'readConfig', []);
 
         const gen = watchCall(action);
         expect(gen.next().value).to.deep.equal(take(CALL_METHOD));
@@ -28,7 +28,7 @@ describe('ups saga', () => {
 
     it('handles an error when reading the file', () => {
 
-        let action = callMethod('ups', 'readConfig', [] );
+        let action = callMethod('ups', 'readConfig', []);
 
         const gen = watchCall(action);
         expect(gen.next().value).to.deep.equal(take(CALL_METHOD));
@@ -39,4 +39,4 @@ describe('ups saga', () => {
         expect(gen.throw('error occured').value).to.deep.equal(put(setMethodState('ups', 'readConfig', REQUEST.ERROR)));
 
     });
-})
+});

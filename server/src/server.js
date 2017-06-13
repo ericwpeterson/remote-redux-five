@@ -2,7 +2,7 @@ import Server from 'socket.io';
 
 import monObjectServer from './monobjectserver';
 import { setStore, unReqisterAllPropWatchers, unReqisterAllMethodWatchers } from './monobjectserver';
-import { callMethod } from './modules/monobject'
+import { callMethod } from './modules/monobject';
 
 import makeStore from './store';
 export const store = makeStore();
@@ -14,8 +14,8 @@ let lastState;
 
 store.subscribe(()=> {
     let newState = store.getState();
-    if ( newState !== lastState ) {
-        console.log( 'store changed ', JSON.stringify(store.getState(), null, 4));
+    if (newState !== lastState) {
+        console.log('store changed ', JSON.stringify(store.getState(), null, 4));
         lastState = newState;
     }
 });
@@ -29,7 +29,7 @@ export default function startServer() {
     actionServer.on('connection', function(socket) {
 
         socket.on('action', function(action) {
-            console.log('got an action', action )
+            console.log('got an action', action);
             store.dispatch(action);
         });
     });
@@ -39,20 +39,20 @@ export default function startServer() {
     io.on('connection', function(socket) {
 
         socket.on('disconnect', function() {
-            unReqisterAllPropWatchers(socket.id)
-            unReqisterAllMethodWatchers(socket.id)
+            unReqisterAllPropWatchers(socket.id);
+            unReqisterAllMethodWatchers(socket.id);
         });
 
         socket.on('Get', function(request) {
-            monObjectServer.get(request)
+            monObjectServer.get(request);
         });
 
         socket.on('Set', function(request) {
-            monObjectServer.set(request)
+            monObjectServer.set(request);
         });
 
         socket.on('Watch', function(request) {
-            monObjectServer.watch(request, socket)
+            monObjectServer.watch(request, socket);
         });
 
         socket.on('UnWatch', function(request) {

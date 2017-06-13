@@ -1,12 +1,13 @@
 
 import io from 'socket.io-client';
 import { fork, take, call, put, cancel } from 'redux-saga/effects';
-import { opStarted, opCompleted } from '../modules/monobject';
-
-let PORT;
-if( SAGA_PORT) {
-    PORT =  +SAGA_PORT; //only will be defined if running from webpack-dev-server
-}
+import { setConnectionState,
+    REQUEST,
+    opStarted,
+    opCompleted,
+    CONNECT_REQUEST,
+    SEND_REQUEST
+} from '../modules/monobject';
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -39,9 +40,9 @@ var MockedSocket = function() {
 //this function is only called from a unit test
 function processMessages(source) {
     source.nextMessage().then(function(ret) {
-      source.increment();
-      processMessages(source);
-  });
+        source.increment();
+        processMessages(source);
+    });
 };
 
 //this function is only called from a unit test
@@ -59,12 +60,12 @@ var Socket = function() {
     let handler;
 
     return {
-        connect: function() {
+        connect: function(port) {
 
-            if ( SAGA_PORT )  {
+            if (port) {
                 let s = io.connect();
                 let protocol = s.io.engine.secure ? "https://" : "http://";
-                socket = io.connect(protocol + s.io.engine.hostname + ":" + SAGA_PORT);
+                socket = io.connect(protocol + s.io.engine.hostname + ":" + port);
                 s.disconnect();
             } else {
                 socket = io.connect();
@@ -135,20 +136,14 @@ export function SourceDelegator(mocked) {
             }
             return deferred.promise;
         },
-        connect: function() {
-            return source.connect();
+        connect: function(port) {
+            return source.connect(port);
         },
         emit: function(msg, data) {
             return source.emit(msg,data);
         },
         source: function() {
             return source;
-        },
-        increment: function() {
-            count++;
-        },
-        getCount: function() {
-            return count;
         }
     };
 }
@@ -171,12 +166,6 @@ var EventSource = (function() {
     };
 })();
 
-export function connect() {
-    let source = EventSource.getInstance();
-    source.connect();
-    return source;
-}
-
 export function* read(msgSource) {
     let msg = yield call(msgSource.nextMessage);
 
@@ -188,25 +177,50 @@ export function* read(msgSource) {
 
 export function* write(msgSource) {
     while (true) {
-        const action = yield take('monobject/SEND_REQUEST');
+        const action = yield take(SEND_REQUEST);
         yield put(opStarted(action));
         yield call(msgSource.emit,action.payload.message, action.payload.data);
     }
 }
 
-export function* watchIncoming() {
-    const eventSource = yield call(connect);
-    yield fork(read, eventSource);
-}
+export function* watchConnect() {
 
-export function* watchOutgoing() {
-    const eventSource = yield call(connect);
-    yield fork(write, eventSource);
+    let bgReadTask;
+    let bgWriteTask;
+    let bgWriteManyTask;
+
+    let eventSource = EventSource.getInstance();
+
+    while (true) {
+        const action = yield take(CONNECT_REQUEST);
+        yield put(setConnectionState(REQUEST.IN_PROGRESS));
+
+        if (bgReadTask) {
+            yield cancel(bgReadTask);
+        }
+
+        if (bgWriteTask) {
+            yield cancel(bgWriteTask);
+        }
+
+        try {
+
+            yield call(eventSource.connect, action.port);
+
+            bgReadTask = yield fork(read, eventSource);
+            bgWriteTask = yield fork(write, eventSource);
+
+            yield put(setConnectionState(REQUEST.COMPLETED));
+
+        } catch (e) {
+            console.log('setting connect error', e);
+            yield put(setConnectionState(REQUEST.ERROR));
+        }
+    }
 }
 
 export default function* rootSaga() {
     yield [
-        watchIncoming(),
-        watchOutgoing(),
+        watchConnect()
     ];
 }

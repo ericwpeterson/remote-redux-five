@@ -4,7 +4,7 @@ import makeStore from '../src/store';
 import {toJS, Map, List } from 'immutable';
 import Immutable from 'immutable';
 
-import { setProperty, callMethod, setMethodState, REQUEST } from '../src/modules/monobject'
+import { setProperty, callMethod, setMethodState, REQUEST } from '../src/modules/monobject';
 
 //console.log( JSON.stringify( nextState.monobjects.toJS(), null, 4 ));
 
@@ -12,7 +12,7 @@ describe('ups reducer', () => {
 
     it('takes startPolling actions', () => {
         const store = makeStore();
-        store.dispatch(callMethod('ups', 'startPolling', [] ));
+        store.dispatch(callMethod('ups', 'startPolling', []));
         let nextState = store.getState();
         expect(nextState.monobjects.toJS().ups.methods.startPolling.state).to.equal(REQUEST.COMPLETED);
     });
@@ -46,4 +46,4 @@ describe('ups reducer', () => {
         expect(nextState.monobjects.toJS().ups.methods.readConfig.state).to.equal(REQUEST.ERROR);
         expect(nextState.monobjects.toJS().ups.methods.readConfig.ret).to.equal('rval');
     });
-})
+});

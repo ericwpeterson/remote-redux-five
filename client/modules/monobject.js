@@ -8,9 +8,11 @@ export const REQUEST = {
 };
 
 // Actions
-const OP_COMPLETED  = 'monobject/OP_COMPLETED';
-const OP_STARTED    = 'monobject/OP_STARTED';
-const SEND_REQUEST  = 'monobject/SEND_REQUEST';
+export const OP_COMPLETED  = 'monobject/OP_COMPLETED';
+export const OP_STARTED    = 'monobject/OP_STARTED';
+export const SEND_REQUEST  = 'monobject/SEND_REQUEST';
+export const CONNECT_REQUEST = 'monobject/CONNECT';
+export const SET_CONNECTION_STATE  = 'monobject/SET_CONNECTION_STATE';
 
 const DEFAULT_STATE = Map({});
 
@@ -18,6 +20,10 @@ export default function monobjectReducer(state = DEFAULT_STATE, action) {
     let ret;
 
     switch (action.type) {
+
+        case SET_CONNECTION_STATE:
+            ret = state.setIn(['connectionState'], action.connectionState);
+            return ret;
 
         case OP_COMPLETED:
             ret = _opCompleted(state, action.payload);
@@ -113,7 +119,7 @@ function _opCompleted(state, payload) {
         ret = state.setIn(['monobjects', payload.monObject, key, arg, 'state'], REQUEST.ERROR);
     } else {
         if (cmd === "Get" || cmd === 'Call' ||  (cmd === 'Watch')) {
-            if ( cmd === 'Call') {
+            if (cmd === 'Call') {
                 ret = state.setIn(['monobjects', payload.monObject, key, arg],
                   Map({value: payload.ret, state: REQUEST.COMPLETED}));
             } else {
@@ -133,6 +139,20 @@ function _opCompleted(state, payload) {
 }
 
 // Action Creators
+
+export function connectMonux(port) {
+    return {
+        type: CONNECT_REQUEST,
+        port: port
+    };
+}
+
+export function setConnectionState(connnectionState) {
+    return {
+        type: SET_CONNECTION_STATE,
+        connectionState: connnectionState
+    };
+}
 
 export function opStarted(action) {
     return {
