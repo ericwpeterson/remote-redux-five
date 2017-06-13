@@ -7,7 +7,7 @@
 
 ### Motivations
  * Use redux on the server. Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events, instead of altering production code or physical devices. 
- * Using a standard protocol, allows us to reuse code across applications. No matter what the underlying transport is ( socket, bluetooth-ble, electron ipc, etc... ), the only thing that changes is a single saga. 
+ * Using a standard protocol allows us to reuse code across applications. No matter what the underlying transport is ( socket, bluetooth-ble, electron ipc, etc... ), the only thing that changes is a single saga. 
 
 ## Protocol
 **_All commands operate in the context of a monobject, which is really just a slice of the redux state tree_**.
