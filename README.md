@@ -1,16 +1,15 @@
-# Distributed Redux Micro-Service Example
+# Remote-Redux-Five -- A Distributed Redux Micro-Service Example
 
 ## Goals
 
 1. Define a standard protocol for communicating to micro-services.
-2. Define a standard redux state tree for micro-services to enable the standard protocol.
+2. Define redux state shape to support a standard communication protocol.
 
 ### Motivations
  * Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events, instead of altering production code or physical devices.
- * Using redux forces us to write clean testable code.
+ * Using redux forces us to write clean and testable code.
  * We can log all actions. If we ever find a bug, reproducing it should only be a matter of playing the log file.
- * Define expressions and automate actions.
- * Standard protocol, allows us to reuse code across applications.  
+ * Using a standard protocol, allows us to reuse code across applications.  
 
 ## Protocol
 **_All commands operate in the context of a monobject, which is really just a slice of the redux state tree_**.
