@@ -3,7 +3,7 @@
 ## Goals
 
 1. Define a standard protocol for communicating to micro-services.
-2. Define redux state shape to support a standard communication protocol.
+2. Define a redux state shape to support a standard communication protocol.
 
 ### Motivations
  * Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events, instead of altering production code or physical devices.
