@@ -82,7 +82,6 @@ export let reqisterMethodWatcher = (monObject, method, handler) => {
     }
     //just making sure that it does not registered twice
     if (R.find((_handler) => _handler.id === handler.id, methodWatchers[path])) {
-        //console.log('already registered', monObject + '.' + method );
         return true;
     } else {
         methodWatchers[path].push(handler);
@@ -98,11 +97,19 @@ export let reqisterMethodWatcher = (monObject, method, handler) => {
     }
 };
 
-function validRequest(requestName, request) {
-
-    console.log(requestName, JSON.stringify(request,null,4));
+export let validRequest = (requestName, request) => {
 
     try {
+
+        if (requestName !== 'get' && requestName !== 'set' && requestName !== 'watch' &&
+              requestName !== 'unwatch' && requestName !== 'call') {
+            throw new Error(requestName + ' is an invalid request');
+        }
+
+        if (!request) {
+            throw new Error(requestName + ' error: invalid request object');
+        }
+
         if (!request.monObject) {
             throw new Error(requestName + ' error: no monObject supplied');
         }
@@ -117,26 +124,24 @@ function validRequest(requestName, request) {
             }
 
         } else {
-
             //all other requests require a property
             if (!request.property) {
                 throw new Error(requestName + "error: no property");
             }
-
             //this one requires a value
-            if (request.property === 'set') {
+            if (requestName === 'set') {
                 if (!request.value) {
                     throw new Error(requestName + "error: no value");
                 }
             }
         }
     } catch (e) {
-        console.log(e, requestName, request);
+        //console.log(e, requestName, request);
         return false;
     }
 
     return true;
-}
+};
 
 let socketWatchNotifier = (w, value, objectPath) => {
     try {
@@ -168,15 +173,15 @@ let socketCallNotifier = (w, value, objectPath) => {
     }
 };
 
-let monObjectServer = {
+export let monObjectServer = {
 
-    get: (request, socket) => {
+    get: (request, emit) => {
         let ret;
         if (validRequest('get', request)) {
             let state = store.getState().monobjects;
             let path = [request.monObject, 'props', request.property];
             let ret = state.getIn(path);
-            socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
+            emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
         } else {
             ret = 'INVALID_ARGS';
         }
@@ -196,18 +201,14 @@ let monObjectServer = {
         return ret;
     },
 
-    watch: (request, socket) => {
+    watch: (request, socket, emit) => {
         let ret;
         if (validRequest('watch', request)) {
             let state = store.getState().monobjects;
             let path = [request.monObject, 'props', request.property];
             let ret = state.getIn(path);
 
-            if (ret) {
-                socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
-            } else {
-                socket.emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'error': false});
-            }
+            emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
 
             reqisterPropWatcher(request.monObject, request.property, {
                 id: socket.id,

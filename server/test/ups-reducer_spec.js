@@ -6,7 +6,7 @@ import Immutable from 'immutable';
 
 import { setProperty, callMethod, setMethodState, REQUEST } from '../src/modules/monobject';
 
-//console.log( JSON.stringify( nextState.monobjects.toJS(), null, 4 ));
+let printState = () => console.log(JSON.stringify(nextState.monobjects.toJS(), null, 4));
 
 describe('ups reducer', () => {
 

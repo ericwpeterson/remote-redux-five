@@ -6,7 +6,6 @@ export const SET_PROP           = 'example1/monobject/SET_PROP';
 export const CALL_METHOD        = 'example1/monobject/CALL_METHOD';
 export const SET_METHOD_STATE   = 'example1/monobject/SET_METHOD_STATE';
 
-
 export const REQUEST = {
     IDLE: 'IDLE',
     IN_PROGRESS: 'IN_PROGRESS',
@@ -26,10 +25,10 @@ export default function monobjectReducer(state = DEFAULT_STATE, action) {
 
             path = [action.monObject, 'props', action.property];
 
-            if ( state.getIn(path) ) {
+            if (state.hasIn(path)) {
                 return state.setIn(path,action.value);
             } else {
-                console.log("failed to set prop", action)
+                console.log("failed to set prop", action);
                 return state;
             }
 
@@ -37,12 +36,12 @@ export default function monobjectReducer(state = DEFAULT_STATE, action) {
 
             path = [action.monObject, 'methods', action.method];
 
-            if ( state.getIn(path)) {
+            if (state.hasIn(path)) {
                 ret = state.setIn([...path, ...['ret']], action.ret);
                 ret = ret.setIn([...path, ...['state']], action.state);
                 return ret;
             } else {
-                console.log("failed to set method state", action)
+                console.log("failed to set method state", action);
                 return state;
             }
 

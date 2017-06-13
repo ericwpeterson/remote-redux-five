@@ -14,9 +14,12 @@ import {
     clearMethodWatchers,
     unReqisterAllPropWatchers,
     unReqisterMethodWatcher,
-    unReqisterAllMethodWatchers
-
+    unReqisterAllMethodWatchers,
+    monObjectServer,
+    validRequest
 } from '../src/monobjectserver';
+
+let printState = (s) => console.log(JSON.stringify(s.monobjects.toJS(), null, 4));
 
 describe('monobjectserver', () => {
 
@@ -265,5 +268,130 @@ describe('monobjectserver', () => {
 
         expect(onChanged123).to.equal(false);
         expect(onChanged124).to.equal(true);
+    });
+
+    it('it handles Watch and Set commands', () => {
+        clearPropWatchers();
+
+        let cbCalled = false;
+
+        const store = makeStore();
+        setStore(store);
+
+        let socket = {
+            id: 1,
+            emit: (message, payload) => {
+                cbCalled = true;
+                expect(payload.value).to.equal(1);
+                expect(payload.op).to.equal('Watch::inputVoltage');
+                expect(payload.monObject).to.equal('ups');
+            }
+        };
+
+        store.dispatch(setProperty('ups', 'inputVoltage', 0));
+
+        let request = {monObject: 'ups', property: 'inputVoltage'};
+
+        monObjectServer.watch(request, socket, (message, payload) => {
+            expect(payload.value).to.equal(0);
+            cbCalled = true;
+        });
+
+        expect(cbCalled).to.equal(true);
+
+        cbCalled = false;
+        request = {monObject: 'ups', property: 'inputVoltage', value: 1};
+
+        monObjectServer.set(request);
+        expect(cbCalled).to.equal(true);
+    });
+
+    it('verifies command packets', () => {
+        let request = {};
+        let ret;
+
+        ret = validRequest();
+        expect(ret).to.equal(false);
+
+        ret = validRequest('get');
+        expect(ret).to.equal(false);
+
+        ret = validRequest('asdfasdfadfs');
+        expect(ret).to.equal(false);
+
+        ret = validRequest('get', {monObject: 'mo'});
+        expect(ret).to.equal(false);
+
+        ret = validRequest('get', {monObject: 'mo', property: 'p'});
+        expect(ret).to.equal(true);
+
+        ret = validRequest('set', {monObject: 'mo', property: 'p'});
+        expect(ret).to.equal(false);
+
+        ret = validRequest('set', {monObject: 'mo', property: 'p', value: 1});
+        expect(ret).to.equal(true);
+
+        ret = validRequest('call', {monObject: 'mo'});
+        expect(ret).to.equal(false);
+
+        ret = validRequest('call', {monObject: 'mo', method: 'bark'});
+        expect(ret).to.equal(false);
+
+        ret = validRequest('call', {monObject: 'mo', method: 'bark', args: []});
+        expect(ret).to.equal(true);
+
+        ret = validRequest('watch', {monObject: 'mo'});
+        expect(ret).to.equal(false);
+
+        ret = validRequest('watch', {monObject: 'mo', property: 'p'});
+        expect(ret).to.equal(true);
+
+        ret = validRequest('unwatch', {monObject: 'mo', property: 'p'});
+        expect(ret).to.equal(true);
+    });
+
+    it('handles Get commands with falsy property values', () => {
+        const store = makeStore();
+        setStore(store);
+        let cbCalled = false;
+
+        store.dispatch(setProperty('ups', 'inputVoltage', false));
+
+        let request = {monObject: 'ups', property: 'inputVoltage'};
+        monObjectServer.get(request, (message, payload) => {
+            expect(payload.value).to.equal(false);
+            cbCalled = true;
+        });
+        expect(cbCalled).to.equal(true);
+    });
+
+    it('handles Get commands with undefined property values', () => {
+        const store = makeStore();
+        setStore(store);
+        let cbCalled = false;
+
+        store.dispatch(setProperty('ups', 'inputVoltage', undefined));
+
+        let request = {monObject: 'ups', property: 'inputVoltage'};
+        monObjectServer.get(request, (message, payload) => {
+            expect(payload.value).to.equal(undefined);
+            cbCalled = true;
+        });
+        expect(cbCalled).to.equal(true);
+    });
+
+    it('handles Get commands with null property values', () => {
+        const store = makeStore();
+        setStore(store);
+        let cbCalled = false;
+
+        store.dispatch(setProperty('ups', 'inputVoltage', null));
+
+        let request = {monObject: 'ups', property: 'inputVoltage'};
+        monObjectServer.get(request, (message, payload) => {
+            expect(payload.value).to.equal(null);
+            cbCalled = true;
+        });
+        expect(cbCalled).to.equal(true);
     });
 });

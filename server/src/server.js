@@ -44,7 +44,7 @@ export default function startServer() {
         });
 
         socket.on('Get', function(request) {
-            monObjectServer.get(request);
+            monObjectServer.get(request, (msg, payload) => { socket.emit(msg, payload); });
         });
 
         socket.on('Set', function(request) {
@@ -52,7 +52,7 @@ export default function startServer() {
         });
 
         socket.on('Watch', function(request) {
-            monObjectServer.watch(request, socket);
+            monObjectServer.watch(request, socket, (msg, payload) => { socket.emit(msg, payload); });
         });
 
         socket.on('UnWatch', function(request) {
