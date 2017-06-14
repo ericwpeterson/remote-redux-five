@@ -2,12 +2,13 @@
 
 ## Goals
 
-1. Define a standard protocol for communicating to micro-services.
+1. Define a standard protocol for manipulating remote redux stores.
 2. Define a redux state shape to support a standard communication protocol.
 
 ### Motivations
- * Use redux on the server. Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events, instead of altering production code or physical devices. 
+ * Use redux on the server. Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events and demo our applications to  stakeholders without ever needing to alter production databases, code, or physical equipment. 
  * Using a standard protocol allows us to reuse code across applications. No matter what the underlying transport is ( web sockets, bluetooth-ble, electron ipc, etc... ), the only thing that changes is a single saga. 
+ * Reduce boilerplate and provide a base to build apps on.   
 
 ## Redux State Store
 **_The client and the server have their own stores. While they might be similar, they are not the same_**.
@@ -35,7 +36,7 @@ export const REQUEST = {
       },
       methods: {
         bark: {
-          ret: "Arroof",
+          value: "Arroof",
           state: REQUEST.COMPLETED
         },
         sit: {
@@ -56,13 +57,12 @@ export const REQUEST = {
 ```javascript
 {
     "monobjects": {
-        "ups": {
+        "dog": {
             "props": {
-                "inputVoltage": 113,
-                "outputVoltage": 120
+                "color": 'brown'
             },
             "methods": {
-                "startPolling": {
+                "bark": {
                     "ret": "return code",
                     "state": "COMPLETED"
                 }
@@ -74,7 +74,8 @@ export const REQUEST = {
 ```
 
 ### Reducer Composition
-In order to support the protocol reducers should insert there state insided the monobjects tree. In this example ups is reducer. See the source code for more information.
+In order to support the protocol, reducers should insert there state inside the monobjects tree, and provide props and methods. In this example dog is a valid monobject reducer. Other state can exist along side the monobject state, but it will not be accessible from the protocol. 
+
 
 ### Get Action Flow
 ![alt text](getflow.png "Logo Title Text 1")
@@ -166,13 +167,13 @@ export function unwatch(monobject, property) {
   Open two terminals.
 
   In first terminal
-  cd server
-  npm install
-  npm start
+   * cd server
+   * npm install
+   * npm start
 
-  In second terminal
-  cd client
-  npm install
-  webpack-dev-server --host YOUR_IP_ADDRESS
+   * In second terminal
+   * cd client
+   * npm install
+   * webpack-dev-server --host YOUR_IP_ADDRESS
 
-  browser http://IPADDR:8080
+   * browser http://IPADDR:8080
