@@ -1,8 +1,7 @@
-
-
 import {expect} from 'chai';
 import makeStore from '../src/store';
 import { setProperty, callMethod, setMethodState } from '../src/modules/monobject';
+import { Map } from 'immutable';
 
 import {
     setStore,
@@ -80,6 +79,96 @@ describe('monobjectserver', () => {
         store.dispatch(setProperty('ups', 'inputVoltage', 110));
         expect(onChanged123).to.equal(true);
         expect(onChanged124).to.equal(true);
+    });
+
+    it('calls prop handlers when immutable a immutable property value changes', () => {
+        let onChanged123 = false;
+        let onChanged124 = false;
+
+        clearPropWatchers();
+        const store = makeStore();
+        setStore(store);
+
+        reqisterPropWatcher('ups', 'inputVoltage', {
+            id: 123,
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(123);
+                onChanged123 = true;
+            }
+        });
+        reqisterPropWatcher('ups', 'inputVoltage', {
+            id: 124,
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(124);
+                onChanged124 = true;
+            }
+        });
+
+        let immutableVal = Map({
+            key: Map({
+                nestedKey: 1
+            })
+        });
+
+        store.dispatch(setProperty('ups', 'inputVoltage', immutableVal));
+        expect(onChanged123).to.equal(true);
+        expect(onChanged124).to.equal(true);
+
+        onChanged123 = false;
+        onChanged124 = false;
+
+        let mutatedImmutable = immutableVal.setIn(['key', 'anotherNestedKey'], 0);
+
+        store.dispatch(setProperty('ups', 'inputVoltage', mutatedImmutable));
+
+        expect(onChanged123).to.equal(true);
+        expect(onChanged124).to.equal(true);
+    });
+
+    it('relies on Immutable === for determining if a property value changes', () => {
+        let onChanged123 = false;
+        let onChanged124 = false;
+
+        clearPropWatchers();
+        const store = makeStore();
+        setStore(store);
+
+        reqisterPropWatcher('ups', 'inputVoltage', {
+            id: 123,
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(123);
+                onChanged123 = true;
+            }
+        });
+        reqisterPropWatcher('ups', 'inputVoltage', {
+            id: 124,
+            onChange: (w, value, objectPath) => {
+                expect(w.id).to.equal(124);
+                onChanged124 = true;
+            }
+        });
+
+        let immutableVal = Map({
+            key: Map({
+                nestedKey: 1,
+                anotherKey: 0
+            })
+        });
+
+        store.dispatch(setProperty('ups', 'inputVoltage', immutableVal));
+        expect(onChanged123).to.equal(true);
+        expect(onChanged124).to.equal(true);
+
+        onChanged123 = false;
+        onChanged124 = false;
+
+        let mutatedImmutable = immutableVal.setIn(['key', 'nestedKey'], 1);
+        mutatedImmutable = immutableVal.setIn(['key', 'anotherKey'], 0);
+        expect(mutatedImmutable === immutableVal).to.equal(true);
+
+        store.dispatch(setProperty('ups', 'inputVoltage', mutatedImmutable));
+        expect(onChanged123).to.equal(false);
+        expect(onChanged124).to.equal(false);
     });
 
     it('calls method handlers when state changes', () => {
@@ -328,7 +417,7 @@ describe('monobjectserver', () => {
         ret = validRequest('set', {monObject: 'mo', property: 'p'});
         expect(ret).to.equal(false);
 
-        ret = validRequest('set', {monObject: 'mo', property: 'p', value: 1});
+        ret = validRequest('set', {monObject: 'mo', property: 'p', value: 0});
         expect(ret).to.equal(true);
 
         ret = validRequest('call', {monObject: 'mo'});

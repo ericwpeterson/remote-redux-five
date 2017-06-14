@@ -130,7 +130,7 @@ export let validRequest = (requestName, request) => {
             }
             //this one requires a value
             if (requestName === 'set') {
-                if (!request.value) {
+                if (!request.hasOwnProperty('value')) {
                     throw new Error(requestName + "error: no value");
                 }
             }
