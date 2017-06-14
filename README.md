@@ -1,4 +1,6 @@
+
 # Remote-Redux-Five -- A Distributed Redux Micro-Service Example
+![alt text](remote-redux-5.png "Logo Title Text 1")
 
 ## Goals
 
