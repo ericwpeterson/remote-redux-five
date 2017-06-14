@@ -171,7 +171,7 @@ export function unwatch(monobject, property) {
    * npm install
    * npm start
 
-   * In second terminal
+  In second terminal
    * cd client
    * npm install
    * webpack-dev-server --host YOUR_IP_ADDRESS
