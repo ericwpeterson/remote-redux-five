@@ -36,7 +36,7 @@ describe('monobject saga', () => {
         let eventSource = new SourceDelegator(true);
 
         let action = {
-            type: 'SEND_REQUEST',
+            type: SEND_REQUEST,
             payload: {
                 message: "Set",
                 data: {

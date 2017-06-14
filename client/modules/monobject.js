@@ -39,64 +39,25 @@ export default function monobjectReducer(state = DEFAULT_STATE, action) {
 }
 
 function _opStarted(state, action) {
-
-    let currentValue;
-    let ret;
+    let path;
 
     if (action.payload.message === 'Call') {
-
-        currentValue = state.getIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'methods',
-                            action.payload.data.method,
-                            'value']);
-        if (currentValue) {
-            ret = state.setIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'methods',
-                            action.payload.data.method
-                        ],
-                        Map({value: currentValue, state: REQUEST.IN_PROGRESS}));
-        } else {
-            ret = state.setIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'methods',
-                            action.payload.data.method
-                        ],
-                        Map({state: REQUEST.IN_PROGRESS}));
-        }
-
+        path = [
+            'monobjects',
+            action.payload.data.monObject,
+            'methods',
+            action.payload.data.method
+        ];
     } else {
-        currentValue = state.getIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'props',
-                            action.payload.data.property,
-                            'value'
-                        ]);
-        if (currentValue) {
-            ret = state.setIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'props',
-                            action.payload.data.property
-                        ],
-                        Map({value: currentValue, state: REQUEST.IN_PROGRESS}));
-        } else {
-            ret = state.setIn([
-                            'monobjects',
-                            action.payload.data.monObject,
-                            'props',
-                            action.payload.data.property
-                        ],
-                        Map({state: REQUEST.IN_PROGRESS}));
-        }
+        path = [
+            'monobjects',
+            action.payload.data.monObject,
+            'props',
+            action.payload.data.property
+        ];
     }
 
-    return ret;
+    return state.setIn(path, Map({state: REQUEST.IN_PROGRESS}));
 }
 
 function _opCompleted(state, payload) {
@@ -118,20 +79,14 @@ function _opCompleted(state, payload) {
     if (payload.error) {
         ret = state.setIn(['monobjects', payload.monObject, key, arg, 'state'], REQUEST.ERROR);
     } else {
-        if (cmd === "Get" || cmd === 'Call' ||  (cmd === 'Watch')) {
+        if (cmd === "Get" || cmd === 'Call' || cmd === 'Watch') {
+            let vkey = 'value';
             if (cmd === 'Call') {
-                ret = state.setIn(['monobjects', payload.monObject, key, arg],
-                  Map({value: payload.ret, state: REQUEST.COMPLETED}));
-            } else {
-                ret = state.setIn(['monobjects', payload.monObject, key, arg],
-                  Map({value: payload.value, state: REQUEST.COMPLETED}));
+                vkey = 'ret';
             }
-        } else if (cmd === 'UnWatch' || cmd === 'Watch') {
-            //preserve the value
-            let currentValue = state.getIn(['monobjects', payload.monObject, key, arg, 'value']);
 
-            ret = state.setIn(['monobjects', payload.monObject, 'props', arg],
-                Map({value: currentValue, state: REQUEST.COMPLETED}));
+            ret = state.setIn(['monobjects', payload.monObject, key, arg],
+                Map({value: payload[vkey], state: REQUEST.COMPLETED}));
         }
     }
 
