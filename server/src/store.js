@@ -15,7 +15,7 @@ import dogReducer from './monobjects/reducers/dog';
 
 let monobjects = combineReducers({ups: upsReducer, dog: dogReducer});
 
-//Making a higher order reducer so all of are monobjects can share the same logic
+//Making a higher order reducer so all of our monobjects can share the same logic.
 let monobjectParent = monobjectReducer(monobjects);
 
 let app = combineReducers({monobjects: monobjectParent});
