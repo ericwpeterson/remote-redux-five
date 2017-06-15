@@ -18,7 +18,7 @@ import {
     validRequest
 } from '../src/monobjectserver';
 
-let printState = (s) => console.log(JSON.stringify(s.monobjects.toJS(), null, 4));
+let printState = (state) => console.log(JSON.stringify(state.toJS(), null, 4));
 
 describe('monobjectserver', () => {
 
@@ -26,6 +26,8 @@ describe('monobjectserver', () => {
         clearPropWatchers();
         const store = makeStore();
         setStore(store);
+
+        //printState(store.getState());
 
         reqisterPropWatcher('ups', 'inputVoltage', {
             id: 123,
@@ -48,9 +50,9 @@ describe('monobjectserver', () => {
             }
         });
 
-        expect(propWatchers['ups.props.inputVoltage'].length).to.equal(2);
-        expect(propWatchers['ups.props.inputVoltage'][0].id).to.equal(123);
-        expect(propWatchers['ups.props.inputVoltage'][1].id).to.equal(124);
+        expect(propWatchers['monobjects.ups.props.inputVoltage'].length).to.equal(2);
+        expect(propWatchers['monobjects.ups.props.inputVoltage'][0].id).to.equal(123);
+        expect(propWatchers['monobjects.ups.props.inputVoltage'][1].id).to.equal(124);
     });
 
     it('calls prop handlers when state changes', () => {
@@ -187,9 +189,7 @@ describe('monobjectserver', () => {
         });
 
         store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1'}]));
-
         expect(onChanged123).to.equal(true);
-
     });
 
     it('unregisters method watchers', () => {
@@ -208,17 +208,11 @@ describe('monobjectserver', () => {
         });
 
         store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1'}]));
-
         expect(onChanged123).to.equal(true);
-
         onChanged123 = false;
-
         unReqisterMethodWatcher('ups', 'startPolling', 123);
-
         store.dispatch(callMethod('ups', 'startPolling', [{'location': '/dev/ttyS1'}]));
-
         expect(onChanged123).to.equal(false);
-
     });
 
     it('unregisters propWatchers', () => {
@@ -254,11 +248,8 @@ describe('monobjectserver', () => {
         onChanged124 = false;
 
         unReqisterPropWatcher('ups', 'inputVoltage', 123);
-
-        expect(propWatchers['ups.props.inputVoltage'].length).to.equal(1);
-
+        expect(propWatchers['monobjects.ups.props.inputVoltage'].length).to.equal(1);
         store.dispatch(setProperty('ups', 'inputVoltage', 0.3));
-
         expect(onChanged123).to.equal(false);
         expect(onChanged124).to.equal(true);
     });

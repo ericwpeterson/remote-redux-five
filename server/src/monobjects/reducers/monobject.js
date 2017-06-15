@@ -15,39 +15,43 @@ export const REQUEST = {
 
 const DEFAULT_STATE = Map({});
 
-export default function monobjectReducer(state = DEFAULT_STATE, action) {
-    let ret;
-    let path;
+export default function(wrapped) {
 
-    switch (action.type) {
+    let ret = function(state = DEFAULT_STATE, action) {
 
-        case SET_PROP:
+        let path;
 
-            path = [action.monObject, 'props', action.property];
+        switch (action.type) {
 
-            if (state.hasIn(path)) {
-                return state.setIn(path,action.value);
-            } else {
-                console.log("failed to set prop", action);
-                return state;
-            }
+            case SET_PROP:
 
-        case SET_METHOD_STATE:
+                path = [action.monObject, 'props', action.property];
 
-            path = [action.monObject, 'methods', action.method];
+                if (state.hasIn(path)) {
+                    return state.setIn(path,action.value);
+                } else {
+                    console.log("failed to set prop", action);
+                    return state;
+                }
 
-            if (state.hasIn(path)) {
-                ret = state.setIn([...path, ...['ret']], action.ret);
-                ret = ret.setIn([...path, ...['state']], action.state);
-                return ret;
-            } else {
-                console.log("failed to set method state", action);
-                return state;
-            }
+            case SET_METHOD_STATE:
 
-        default:
-            return state;
-    }
+                path = [action.monObject, 'methods', action.method];
+
+                if (state.hasIn(path)) {
+                    ret = state.setIn([...path, ...['ret']], action.ret);
+                    ret = ret.setIn([...path, ...['state']], action.state);
+                    return ret;
+                } else {
+                    console.log("failed to set method state", action);
+                    return state;
+                }
+        }
+
+        return wrapped(state, action);
+    };
+
+    return ret;
 }
 
 // Action Creators

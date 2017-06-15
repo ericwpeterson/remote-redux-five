@@ -28,7 +28,7 @@ export function unReqisterAllPropWatchers(id) {
 //NOTE: unReqisterPropWatcher just removes the notification on the underlying socket from happening.
 // It does not unSubscribe from the store.
 export function unReqisterPropWatcher(monObject, property, id) {
-    let path = monObject + '.props.' + property;
+    let path = 'monobjects.' + monObject + '.props.' + property;
 
     if (propWatchers[path].length > 0) {
         let filtered = R.reject(R.where({id: R.equals(id)}), propWatchers[path]);
@@ -37,7 +37,7 @@ export function unReqisterPropWatcher(monObject, property, id) {
 }
 
 export function reqisterPropWatcher(monObject, property, handler) {
-    let path = monObject + '.props.' + property;
+    let path = 'monobjects.' + monObject + '.props.' + property;
 
     if (!propWatchers[path]) {
         propWatchers[path] = [];
@@ -66,7 +66,7 @@ export function unReqisterAllMethodWatchers(id) {
 }
 
 export let unReqisterMethodWatcher = (monObject, method, id) => {
-    let path = monObject + '.methods.' + method + '.state';
+    let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
 
     if (methodWatchers[path].length > 0) {
         let filtered = R.reject(R.where({id: R.equals(id)}), methodWatchers[path]);
@@ -75,7 +75,7 @@ export let unReqisterMethodWatcher = (monObject, method, id) => {
 };
 
 export let reqisterMethodWatcher = (monObject, method, handler) => {
-    let path = monObject + '.methods.' + method + '.state';
+    let path = 'monobjects.' + monObject + '.methods.' + method + '.state';
 
     if (!methodWatchers[path]) {
         methodWatchers[path] = [];
@@ -178,8 +178,8 @@ export let monObjectServer = {
     get: (request, emit) => {
         let ret;
         if (validRequest('get', request)) {
-            let state = store.getState().monobjects;
-            let path = [request.monObject, 'props', request.property];
+            let state = store.getState();
+            let path = ['monobjects', request.monObject, 'props', request.property];
             let ret = state.getIn(path);
             emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
         } else {
@@ -204,8 +204,8 @@ export let monObjectServer = {
     watch: (request, socket, emit) => {
         let ret;
         if (validRequest('watch', request)) {
-            let state = store.getState().monobjects;
-            let path = [request.monObject, 'props', request.property];
+            let state = store.getState();
+            let path = ['monobjects', request.monObject, 'props', request.property];
             let ret = state.getIn(path);
 
             emit("opCompleted", {'op': "Watch::" + request.property, 'monObject': request.monObject, 'value': ret, 'error': false});
