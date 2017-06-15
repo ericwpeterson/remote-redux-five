@@ -4,9 +4,9 @@ import makeStore from '../src/store';
 
 import { put, call, take } from 'redux-saga/effects';
 
-import { watchCall, readConfig } from '../src/modules/ups-saga';
+import { watchCall, readConfig } from '../src/monobjects/sagas/ups-saga';
 
-import { setProperty, callMethod, CALL_METHOD, setMethodState, REQUEST } from '../src/modules/monobject';
+import { setProperty, callMethod, CALL_METHOD, setMethodState, REQUEST } from '../src/monobjects/reducers/monobject';
 
 describe('ups saga', () => {
 

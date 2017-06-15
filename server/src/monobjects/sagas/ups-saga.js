@@ -1,6 +1,6 @@
 import { delay } from 'redux-saga';
 import { take, call, put } from 'redux-saga/effects';
-import { CALL_METHOD, setProperty, setMethodState, REQUEST } from './monobject.js'
+import { CALL_METHOD, setProperty, setMethodState, REQUEST } from '../reducers/monobject.js'
 
 export let readConfig = () => {
     return new Promise(resolve => {

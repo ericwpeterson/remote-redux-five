@@ -1,4 +1,4 @@
-import { setProperty, callMethod, REQUEST } from './modules/monobject';
+import { setProperty, callMethod, REQUEST } from './monobjects/reducers/monobject';
 import { watch } from './watch';
 import R from 'ramda';
 

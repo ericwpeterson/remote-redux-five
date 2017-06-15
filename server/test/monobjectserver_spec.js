@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import makeStore from '../src/store';
-import { setProperty, callMethod, setMethodState } from '../src/modules/monobject';
+import { setProperty, callMethod, setMethodState } from '../src/monobjects/reducers/monobject';
 import { Map } from 'immutable';
 
 import {
