@@ -1,6 +1,8 @@
 
-# Remote-Redux-Five -- A Distributed Redux Boilerplate
+# Remote-Redux-Five
 ![RemoteReduxFive](remote-redux-5.png "Remote Redux Five")
+
+# A Distributed Redux Boilerplate
 
 ## Goals
 
@@ -77,6 +79,18 @@ export const REQUEST = {
 
 ### Reducer Composition
 In order to support the protocol, reducers should insert there state inside the monobjects tree, and provide props and methods. In this example dog is a valid monobject reducer. Other state can exist along side the monobject state, but it will not be accessible from the protocol. 
+
+```javascript
+import monobjectReducer from './monobjects/reducers/monobject';
+import upsReducer from './monobjects/reducers/ups';
+import dogReducer from './monobjects/reducers/dog';
+
+let monobjects = combineReducers({ups: upsReducer, dog: dogReducer});
+
+//We are making a higher order reducer so all monobjects can share the same logic
+let monobjectParent = monobjectReducer(monobjects);
+
+```
 
 
 ### Get Action Flow
