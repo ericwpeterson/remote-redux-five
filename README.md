@@ -12,7 +12,7 @@
 ### Motivations
  * Use redux on the server. Just as redux-devtools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events and demo our applications to  stakeholders without ever needing to alter production databases, code, or physical equipment. 
  * Using a standard protocol allows us to reuse communication code across applications. No matter what the underlying transport is, whether it is websockets, bluetooth-ble, or electron ipc, it's abstracted by a single saga. 
- * Reduce boilerplate and provide a base to build apps for web, electron, and mobile devices.    
+ * Reduce boilerplate and provide a base to build React Native, Electron, and Web apps.     
 
 ## Redux State Store
 **_The client and the server have their own stores. While they might be similar, they are not the same_**.
