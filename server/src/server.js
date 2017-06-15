@@ -2,7 +2,7 @@ import Server from 'socket.io';
 
 import monObjectServer from './monobjectserver';
 import { setStore, unReqisterAllPropWatchers, unReqisterAllMethodWatchers } from './monobjectserver';
-import { callMethod } from './modules/monobject';
+import { callMethod } from './monobjects/reducers/monobject';
 
 import makeStore from './store';
 export const store = makeStore();

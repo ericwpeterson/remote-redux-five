@@ -160,8 +160,8 @@ let socketCallNotifier = (w, value, objectPath) => {
         //NOTE: When the request is finished no longer need to watch its state
         unReqisterMethodWatcher(w.monObject, w.method, w.id);
 
-        let state = store.getState().monobjects;
-        let path = [w.monObject, 'methods', w.method, 'ret'];
+        let state = store.getState();
+        let path = ['monobjects', w.monObject, 'methods', w.method, 'ret'];
 
         let ret = state.getIn(path);
 
