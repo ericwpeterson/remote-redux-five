@@ -2,7 +2,7 @@
 # Remote-Redux-Five
 ![RemoteReduxFive](remote-redux-5.png "Remote Redux Five")
 
-# A Distributed Redux Boilerplate
+**_A distributed redux boilerplate_**.
 
 ## Goals
 
