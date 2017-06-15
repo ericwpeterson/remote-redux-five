@@ -10,9 +10,9 @@
 2. Define a redux state shape to support a standard communication protocol.
 
 ### Motivations
- * Use redux on the server. Just as redux dev tools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events and demo our applications to  stakeholders without ever needing to alter production databases, code, or physical equipment. 
- * Using a standard protocol allows us to reuse code across applications. No matter what the underlying transport is ( web sockets, bluetooth-ble, electron ipc, etc... ), the only thing that changes is a single saga. 
- * Reduce boilerplate and provide a base to build apps on.   
+ * Use redux on the server. Just as redux-devtools is great for UI development, wouldn't it be great to run a similar tool to simulate various conditions on the micro-service layer? In doing so, we can simulate events and demo our applications to  stakeholders without ever needing to alter production databases, code, or physical equipment. 
+ * Using a standard protocol allows us to reuse communication code across applications. No matter what the underlying transport is, whether it is websockets, bluetooth-ble, or electron ipc, it's abstracted by a single saga. 
+ * Reduce boilerplate and provide a base to build apps for web, electron, and mobile devices.    
 
 ## Redux State Store
 **_The client and the server have their own stores. While they might be similar, they are not the same_**.
@@ -51,13 +51,14 @@ export const REQUEST = {
         }
       }
     }
-  }
+  } 
+  //Other app state... 
 }
 
 ```
 
 ### Server
-**_The state tree of this example application_**.
+**_An example state tree_**.
 ```javascript
 {
     "monobjects": {
@@ -73,6 +74,7 @@ export const REQUEST = {
             }
         }
     }
+    //Other app state...
 }
 
 ```
