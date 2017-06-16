@@ -80,7 +80,7 @@ export const REQUEST = {
 ```
 
 ### Reducer Composition
-In order to support the protocol, reducers should insert there state inside the monobjects tree, and provide props and methods. In this example dog is a valid monobject reducer. Other state can exist along side the monobject state, but it will not be accessible from the protocol. 
+In order to support the protocol, reducers should insert their state inside the monobjects tree, and provide props and methods. In this example dog is a valid monobject reducer. Other state can exist along side the monobject state, but it will not be accessible from the protocol. 
 
 ```javascript
 import monobjectReducer from './monobjects/reducers/monobject';
